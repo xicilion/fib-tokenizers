@@ -1,0 +1,6 @@
+[submodule "fib-addon"]
+	path = fib-addon
+	url = https://github.com/fibjs/fib-addon.git
+[submodule "huggingface-tokenizer-in-cxx"]
+	path = huggingface-tokenizer-in-cxx
+	url = https://github.com/wangkuiyi/huggingface-tokenizer-in-cxx.git

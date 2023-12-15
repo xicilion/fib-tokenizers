@@ -1,0 +1,4 @@
+/out
+/bin
+/temp/*
+/.vscode/launch.json
