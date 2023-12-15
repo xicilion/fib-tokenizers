@@ -83,14 +83,15 @@ napi_value SPTokenizer::encode(napi_env env, napi_callback_info info)
         napi_throw_error(env, NULL, e.what());
     }
 
-    napi_value ret;
-    NODE_API_CALL(env, napi_create_array(env, &ret));
+    napi_value output_buffer;
+    float* output_ptr = NULL;
+    NODE_API_CALL(env, napi_create_arraybuffer(env, ids.size() * sizeof(float), (void**)&output_ptr, &output_buffer));
 
-    for (size_t i = 0; i < ids.size(); i++) {
-        napi_value e;
-        NODE_API_CALL(env, napi_create_int64(env, ids[i], &e));
-        NODE_API_CALL(env, napi_set_element(env, ret, i, e));
-    }
+    napi_value ret;
+    NODE_API_CALL(env, napi_create_typedarray(env, napi_float32_array, ids.size(), output_buffer, 0, &ret));
+
+    for (size_t i = 0; i < ids.size(); i++)
+        output_ptr[i] = ids[i];
 
     return ret;
 }
@@ -111,10 +112,22 @@ napi_value SPTokenizer::decode(napi_env env, napi_callback_info info)
     NODE_API_CALL(env, napi_typeof(env, args[0], &valuetype0));
     NODE_API_ASSERT(env, valuetype0 == napi_object, "Wrong argument type, must be object");
 
-    uint32_t i, length;
-    NODE_API_CALL(env, napi_get_array_length(env, args[0], &length));
+    bool is_typedarray;
+    NODE_API_CALL(env, napi_is_typedarray(env, args[0], &is_typedarray));
 
     std::vector<int> ids;
+    uint32_t i, length;
+    if (is_typedarray) {
+        napi_typedarray_type type;
+        napi_value input_buffer;
+        size_t byte_offset;
+        size_t item_length;
+        NODE_API_CALL(env, napi_get_typedarray_info(env, args[0], &type, &item_length, NULL, &input_buffer, &byte_offset));
+        length = item_length;
+    } else {
+        NODE_API_CALL(env, napi_get_array_length(env, args[0], &length));
+    }
+
     for (i = 0; i < length; i++) {
         napi_value e;
         NODE_API_CALL(env, napi_get_element(env, args[0], i, &e));
@@ -124,7 +137,6 @@ napi_value SPTokenizer::decode(napi_env env, napi_callback_info info)
     }
 
     std::string txt;
-
     try {
         obj->sentence_piece_.Decode(ids, &txt).IgnoreError();
     } catch (std::exception& e) {
