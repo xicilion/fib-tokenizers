@@ -1,4 +1,5 @@
 #include <string.h>
+#include <locale>
 #include "HFTokenizer.h"
 
 napi_ref HFTokenizer::constructor;
@@ -29,7 +30,8 @@ std::string to_string(napi_env env, napi_value value)
     NODE_API_CALL(env, napi_get_value_string_utf8(env, value, nullptr, 0, &sz));
     std::string str;
     str.resize(sz);
-    NODE_API_CALL(env, napi_get_value_string_utf8(env, value, str.data(), sz + 1, nullptr));
+    char* data = &str[0];
+    NODE_API_CALL(env, napi_get_value_string_utf8(env, value, data, sz + 1, nullptr));
     return str;
 }
 
