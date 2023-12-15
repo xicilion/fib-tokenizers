@@ -6,15 +6,15 @@
 #include "common.h"
 #include "bpe.h"
 
-class HFTokenizer {
+class Tokenizer {
 public:
-    HFTokenizer()
+    Tokenizer()
         : env_(nullptr)
         , wrapper_(nullptr)
     {
     }
 
-    ~HFTokenizer()
+    ~Tokenizer()
     {
         napi_delete_reference(env_, wrapper_);
     }
@@ -41,7 +41,7 @@ public:
 
     static void Destructor(napi_env env, void* nativeObject, void*)
     {
-        HFTokenizer* obj = static_cast<HFTokenizer*>(nativeObject);
+        Tokenizer* obj = static_cast<Tokenizer*>(nativeObject);
         delete obj;
     }
 
@@ -51,7 +51,6 @@ private:
         return napi_value();
     }
 
-    static napi_value json(napi_env env, napi_callback_info info);
     static napi_value encode(napi_env env, napi_callback_info info);
     static napi_value decode(napi_env env, napi_callback_info info);
 
