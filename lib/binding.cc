@@ -26,7 +26,7 @@ void HFTokenizer::Init(napi_env env)
 
 std::string to_string(napi_env env, napi_value value)
 {
-    size_t sz;
+    size_t sz = 0;
     NODE_API_CALL(env, napi_get_value_string_utf8(env, value, nullptr, 0, &sz));
     std::string str;
     str.resize(sz);
@@ -53,19 +53,8 @@ napi_value HFTokenizer::from(napi_env env, napi_callback_info info)
     NODE_API_CALL(env, napi_typeof(env, args[0], &valuetype0));
     NODE_API_ASSERT(env, valuetype0 == napi_object, "Wrong argument type, must be object");
 
-    bool is_typedarray;
-    NODE_API_CALL(env, napi_is_typedarray(env, args[1], &is_typedarray));
-    NODE_API_ASSERT(env, is_typedarray, "Wrong type of arguments. Expects a typed array as first argument.");
-
-    napi_typedarray_type type;
-    napi_value input_buffer;
-    size_t byte_offset;
-    size_t merge_length;
-    NODE_API_CALL(env, napi_get_typedarray_info(env, args[1], &type, &merge_length, NULL, &input_buffer, &byte_offset));
-    NODE_API_ASSERT(env, type == napi_uint8_array, "Wrong type of arguments. Expects a typed array as first argument.");
-
-    char* merge_data;
-    NODE_API_CALL(env, napi_get_arraybuffer_info(env, input_buffer, (void**)&merge_data, &merge_length));
+    NODE_API_CALL(env, napi_typeof(env, args[1], &valuetype0));
+    NODE_API_ASSERT(env, valuetype0 == napi_object, "Wrong argument type, must be object");
 
     napi_value keys;
     NODE_API_CALL(env, napi_get_property_names(env, args[0], &keys));
@@ -88,32 +77,25 @@ napi_value HFTokenizer::from(napi_env env, napi_callback_info info)
             tok->i2t.insert({ value, key });
         }
 
-        int nmerge_count = 0;
-        while (merge_length) {
-            char* t1 = merge_data;
-            char* spc = (char*)memchr(merge_data, ' ', merge_length);
-            if (!spc)
-                break;
-            merge_length -= (spc - merge_data) + 1;
-            merge_data = spc + 1;
+        uint32_t merge_length;
+        NODE_API_CALL(env, napi_get_array_length(env, args[1], &merge_length));
 
-            char* t2 = merge_data;
-            char* endl = (char*)memchr(merge_data, '\n', merge_length);
-            if (!endl) {
-                endl = merge_data + merge_length;
-                merge_length = 0;
-            } else {
-                merge_length -= (endl - merge_data) + 1;
-                merge_data = endl + 1;
-            }
+        for (uint32_t merge_count = 1; merge_count < merge_length; merge_count++) {
+            napi_value e;
+            NODE_API_CALL(env, napi_get_element(env, args[1], merge_count, &e));
+            std::string line = to_string(env, e);
+            if (line.length() == 0)
+                continue;
 
-            if (nmerge_count > 0) {
-                tok->bpe_ranks.insert({ { utf8_to_wstring(t1, spc),
-                                            utf8_to_wstring(t2, endl) },
-                    nmerge_count - 1 });
-            }
-            nmerge_count++;
+            int d = line.find(" ");
+            if (d == std::string::npos)
+                throw std::runtime_error("Wrong format of merge file");
+
+            tok->bpe_ranks.insert({ { utf8_to_wstring(line.substr(0, d)),
+                                        utf8_to_wstring(line.substr(d + 1)) },
+                merge_count - 1 });
         }
+
     } catch (...) {
         delete tok;
         throw;
