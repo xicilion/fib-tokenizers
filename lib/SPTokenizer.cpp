@@ -84,7 +84,10 @@ napi_value SPTokenizer::from(napi_env env, napi_callback_info info)
                     NODE_API_CALL(env, napi_typeof(env, e, &valuetype2));
                     NODE_API_ASSERT(env, valuetype2 == napi_string, "Wrong argument type, `extra_options[]` must be string");
 
-                    tok->added_tokens.push_back(to_string(env, e));
+                    std::string stok = to_string(env, e);
+                    tok->added_tokens.push_back(stok);
+                    if (stok == "<unk>")
+                        tok->unk_id = i;
                 }
             }
         } catch (...) {
@@ -100,22 +103,29 @@ void SPTokenizer::encode(const std::string& txt, std::vector<int>& ids)
 {
     sentencepiece::SentencePieceText spt;
     sentence_piece_.Encode(txt, &spt);
+    size_t added_tokens_size = added_tokens.size();
 
     ids.resize(spt.pieces_size());
     for (int i = 0; i < spt.pieces_size(); i++) {
-        int j;
         auto piece = spt.pieces(i);
-        std::string txt = piece.piece();
 
-        for (j = 0; j < added_tokens.size(); j++) {
-            if (txt == added_tokens[j]) {
-                ids[i] = j;
-                break;
+        if (added_tokens_size || offset) {
+            int j;
+            std::string txt = piece.piece();
+
+            for (j = 0; j < added_tokens_size; j++) {
+                if (txt == added_tokens[j]) {
+                    ids[i] = j;
+                    break;
+                }
             }
-        }
 
-        if (j == added_tokens.size())
-            ids[i] = piece.id() + offset;
+            if (j == added_tokens_size) {
+                uint32_t id = piece.id();
+                ids[i] = id ? id + offset : unk_id;
+            }
+        } else
+            ids[i] = piece.id();
     }
 }
 
@@ -124,11 +134,12 @@ void SPTokenizer::decode(const std::vector<int>& ids, std::string& txt)
     std::vector<std::string> pieces;
     const int num_pieces = sentence_piece_.GetPieceSize();
     pieces.reserve(ids.size());
+    size_t added_tokens_size = added_tokens.size();
 
     for (const int id : ids) {
         if (id < 0 || id >= num_pieces + offset)
             pieces.emplace_back("");
-        else if (id < added_tokens.size())
+        else if (id < added_tokens_size)
             pieces.emplace_back(added_tokens[id]);
         else
             pieces.emplace_back(sentence_piece_.IdToPiece(id - offset));

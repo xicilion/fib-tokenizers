@@ -17,4 +17,5 @@ private:
 private:
     std::vector<std::string> added_tokens;
     int32_t offset = 0;
+    uint32_t unk_id = 0;
 };
