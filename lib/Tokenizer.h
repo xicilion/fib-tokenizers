@@ -19,13 +19,8 @@ public:
     }
 
 public:
-    virtual void encode(const std::string& txt, std::vector<int>& ids)
-    {
-    }
-
-    virtual void decode(const std::vector<int>& ids, std::string& txt)
-    {
-    }
+    virtual void encode(const std::string& txt, std::vector<int>& ids) = 0;
+    virtual void decode(const std::vector<int>& ids, std::string& txt) = 0;
 
 public:
     static void Init(napi_env env);

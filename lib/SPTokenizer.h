@@ -13,4 +13,8 @@ public:
 
 private:
     sentencepiece::SentencePieceProcessor sentence_piece_;
+
+private:
+    std::vector<std::string> added_tokens;
+    int32_t offset = 0;
 };
