@@ -1,9 +1,10 @@
 #pragma once
 
 #include "Tokenizer.h"
-#include "sentencepiece_processor.h"
+#include <unordered_map>
+#include "bpe.h"
 
-class SPTokenizer : public Tokenizer {
+class HFTokenizer : public Tokenizer {
 public:
     static napi_value from(napi_env env, napi_callback_info info);
 
@@ -12,5 +13,7 @@ public:
     virtual void decode(const std::vector<int>& ids, std::string& txt);
 
 private:
-    sentencepiece::SentencePieceProcessor sentence_piece_;
+    std::unordered_map<std::string, int> t2i;
+    std::unordered_map<int, std::string> i2t;
+    BPERanks bpe_ranks;
 };

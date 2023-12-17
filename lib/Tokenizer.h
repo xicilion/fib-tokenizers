@@ -1,10 +1,9 @@
 #pragma once
 
 #include <node_api.h>
-#include <string>
-#include <unordered_map>
 #include "common.h"
-#include "bpe.h"
+#include <string>
+#include <vector>
 
 class Tokenizer {
 public:
@@ -14,35 +13,34 @@ public:
     {
     }
 
-    ~Tokenizer()
+    virtual ~Tokenizer()
     {
         napi_delete_reference(env_, wrapper_);
     }
 
 public:
-    napi_value wrap(napi_env env)
+    virtual void encode(const std::string& txt, std::vector<int>& ids)
     {
-        env_ = env;
+    }
 
-        napi_value cons;
-        NODE_API_CALL(env, napi_get_reference_value(env, constructor, &cons));
-
-        napi_value _this;
-        NODE_API_CALL(env, napi_new_instance(env, cons, 0, nullptr, &_this));
-
-        NODE_API_CALL(env, napi_wrap(env, _this, this, Destructor, nullptr, &wrapper_));
-
-        return _this;
+    virtual void decode(const std::vector<int>& ids, std::string& txt)
+    {
     }
 
 public:
     static void Init(napi_env env);
     static napi_value from(napi_env env, napi_callback_info info);
+    napi_value wrap(napi_env env);
 
-    static void Destructor(napi_env env, void* nativeObject, void*)
+    static std::string to_string(napi_env env, napi_value value)
     {
-        Tokenizer* obj = static_cast<Tokenizer*>(nativeObject);
-        delete obj;
+        size_t sz = 0;
+        NODE_API_CALL(env, napi_get_value_string_utf8(env, value, nullptr, 0, &sz));
+        std::string str;
+        str.resize(sz);
+        char* data = &str[0];
+        NODE_API_CALL(env, napi_get_value_string_utf8(env, value, data, sz + 1, nullptr));
+        return str;
     }
 
 private:
@@ -51,15 +49,17 @@ private:
         return napi_value();
     }
 
+    static void Destructor(napi_env env, void* nativeObject, void*)
+    {
+        Tokenizer* obj = static_cast<Tokenizer*>(nativeObject);
+        delete obj;
+    }
+
     static napi_value encode(napi_env env, napi_callback_info info);
     static napi_value decode(napi_env env, napi_callback_info info);
 
+private:
     static napi_ref constructor;
     napi_env env_;
     napi_ref wrapper_;
-
-public:
-    std::unordered_map<std::string, int> t2i;
-    std::unordered_map<int, std::string> i2t;
-    BPERanks bpe_ranks;
 };
