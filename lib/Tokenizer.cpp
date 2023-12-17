@@ -22,7 +22,7 @@ napi_value Tokenizer::from(napi_env env, napi_callback_info info)
     napi_value args[1];
     NODE_API_CALL(env, napi_get_cb_info(env, info, &argc, args, nullptr, nullptr));
 
-    NODE_API_ASSERT(env, argc == 1, "Wrong number of arguments");
+    NODE_API_ASSERT(env, argc >= 1, "Wrong number of arguments");
 
     bool is_typedarray;
     NODE_API_CALL(env, napi_is_typedarray(env, args[0], &is_typedarray));
