@@ -17,3 +17,6 @@ bin
 out
 
 huggingface-tokenizer-in-cxx
+cpp-tiktoken
+sentencepiece
+pcre

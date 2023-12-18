@@ -44,6 +44,9 @@ tokenizers.from_file = function (vocab, merges) {
         return tokenizers.from(fs.readFileSync(vocab), merges);
     }
 
+    if (extname === '.tiktoken')
+        return tokenizers.from(fs.readFileSync(vocab).toString().split('\n'), merges);
+
     if (path.extname(vocab) !== '.json')
         throw new Error(`Unknown file extension: ${vocab}`);
 

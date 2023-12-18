@@ -1,9 +1,12 @@
 [submodule "fib-addon"]
-	path = fib-addon
-	url = https://github.com/fibjs/fib-addon.git
+path = fib-addon
+url = https://github.com/fibjs/fib-addon.git
 [submodule "huggingface-tokenizer-in-cxx"]
-	path = huggingface-tokenizer-in-cxx
-	url = https://github.com/wangkuiyi/huggingface-tokenizer-in-cxx.git
+path = huggingface-tokenizer-in-cxx
+url = https://github.com/wangkuiyi/huggingface-tokenizer-in-cxx.git
 [submodule "sentencepiece"]
-	path = sentencepiece
-	url = https://github.com/google/sentencepiece.git
+path = sentencepiece
+url = https://github.com/google/sentencepiece.git
+[submodule "cpp-tiktoken"]
+path = cpp-tiktoken
+url = https://github.com/gh-markt/cpp-tiktoken.git

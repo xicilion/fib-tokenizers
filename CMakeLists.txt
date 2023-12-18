@@ -13,7 +13,13 @@ file(GLOB src_list
 
     "${PROJECT_SOURCE_DIR}/sentencepiece/third_party/protobuf-lite/*.c*"
 
+    "${PROJECT_SOURCE_DIR}/pcre/*.c*"
+
     "${PROJECT_SOURCE_DIR}/sentencepiece/third_party/absl/flags/flag.cc"
+
+    "${PROJECT_SOURCE_DIR}/cpp-tiktoken/modelparams.cc"
+    "${PROJECT_SOURCE_DIR}/cpp-tiktoken/encoding.cc"
+    "${PROJECT_SOURCE_DIR}/cpp-tiktoken/encoding_utils.cc"
 )
 
 list(FILTER src_list EXCLUDE REGEX ".*\_main.cc$")
@@ -26,6 +32,8 @@ include_directories(
     "${PROJECT_SOURCE_DIR}/sentencepiece/src/builtin_pb"
     "${PROJECT_SOURCE_DIR}/sentencepiece/third_party/protobuf-lite"
     "${PROJECT_SOURCE_DIR}/sentencepiece"
+    "${PROJECT_SOURCE_DIR}/cpp-tiktoken"
+    "${PROJECT_SOURCE_DIR}/lib"
 )
 
 include(fib-addon/common.cmake)

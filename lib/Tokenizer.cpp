@@ -1,6 +1,7 @@
 #include "Tokenizer.h"
 #include "HFTokenizer.h"
 #include "SPTokenizer.h"
+#include "TikTokenizer.h"
 
 napi_ref Tokenizer::constructor;
 
@@ -26,8 +27,15 @@ napi_value Tokenizer::from(napi_env env, napi_callback_info info)
 
     bool is_typedarray;
     NODE_API_CALL(env, napi_is_typedarray(env, args[0], &is_typedarray));
+    if (is_typedarray)
+        return SPTokenizer::from(env, info);
 
-    return is_typedarray ? SPTokenizer::from(env, info) : HFTokenizer::from(env, info);
+    bool is_array;
+    NODE_API_CALL(env, napi_is_array(env, args[0], &is_array));
+    if (is_array)
+        return TikTokenizer::from(env, info);
+
+    return HFTokenizer::from(env, info);
 }
 
 napi_value Tokenizer::encode(napi_env env, napi_callback_info info)
