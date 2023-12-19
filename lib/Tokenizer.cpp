@@ -1,5 +1,5 @@
 #include "Tokenizer.h"
-#include "HFTokenizer.h"
+#include "BPETokenizer.h"
 #include "SPTokenizer.h"
 #include "TikTokenizer.h"
 
@@ -35,7 +35,7 @@ napi_value Tokenizer::from(napi_env env, napi_callback_info info)
     if (is_array)
         return TikTokenizer::from(env, info);
 
-    return HFTokenizer::from(env, info);
+    return BPETokenizer::from(env, info);
 }
 
 napi_value Tokenizer::encode(napi_env env, napi_callback_info info)

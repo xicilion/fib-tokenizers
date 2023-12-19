@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include "bpe.h"
 
-class HFTokenizer : public Tokenizer {
+class BPETokenizer : public Tokenizer {
 public:
     static napi_value from(napi_env env, napi_callback_info info);
 

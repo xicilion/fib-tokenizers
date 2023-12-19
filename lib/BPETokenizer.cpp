@@ -1,9 +1,7 @@
 #include <locale>
-#include "HFTokenizer.h"
+#include "BPETokenizer.h"
 
-static RE2 re(
-    "('s|'t|'re|'ve|'m|'ll|'d| ?\\p{L}+| ?\\p{N}+| "
-    "?[^\\s\\p{L}\\p{N}]+|\\s+\\(?!\\S\\)|\\s+)");
+static RE2 re("('s|'t|'re|'ve|'m|'ll|'d| ?\\p{L}+| ?\\p{N}+| ?[^\\s\\p{L}\\p{N}]+|\\s+\\(?!\\S\\)|\\s+)");
 static std::unordered_map<uint8_t, wchar_t> b2u;
 static std::unordered_map<wchar_t, uint8_t> u2b;
 
@@ -22,7 +20,7 @@ std::wstring utf8_to_wstring(const char* str, const char* str_end)
     return myconv.from_bytes(str, str_end);
 }
 
-napi_value HFTokenizer::from(napi_env env, napi_callback_info info)
+napi_value BPETokenizer::from(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
     napi_value args[2];
@@ -43,7 +41,7 @@ napi_value HFTokenizer::from(napi_env env, napi_callback_info info)
     uint32_t i, length;
     NODE_API_CALL(env, napi_get_array_length(env, keys, &length));
 
-    HFTokenizer* tok = new HFTokenizer();
+    BPETokenizer* tok = new BPETokenizer();
     try {
         for (i = 0; i < length; i++) {
             napi_value k, v;
@@ -85,12 +83,12 @@ napi_value HFTokenizer::from(napi_env env, napi_callback_info info)
     return tok->wrap(env);
 }
 
-void HFTokenizer::encode(const std::string& txt, std::vector<int>& ids)
+void BPETokenizer::encode(const std::string& txt, std::vector<int>& ids)
 {
     ::encode(txt, re, bpe_ranks, b2u, t2i, &ids);
 }
 
-void HFTokenizer::decode(const std::vector<int>& ids, std::string& txt)
+void BPETokenizer::decode(const std::vector<int>& ids, std::string& txt)
 {
     txt = ::decode(ids, u2b, i2t);
 }
