@@ -41,11 +41,11 @@ tokenizers.from_file = function (vocab, merges) {
             merges = opt;
         }
 
-        return tokenizers.from(fs.readFileSync(vocab), merges);
+        return tokenizers.from("sentencepiece", fs.readFileSync(vocab), merges);
     }
 
     if (extname === '.tiktoken')
-        return tokenizers.from(fs.readFileSync(vocab).toString().split('\n'), merges);
+        return tokenizers.from("tiktoken", fs.readFileSync(vocab).toString().split('\n'), merges);
 
     if (path.extname(vocab) !== '.json')
         throw new Error(`Unknown file extension: ${vocab}`);
@@ -55,10 +55,10 @@ tokenizers.from_file = function (vocab, merges) {
         if (path.extname(merges) !== '.txt')
             throw new Error(`Unknown file extension: ${merges}`);
 
-        return tokenizers.from(vocab, fs.readFileSync(merges, "utf8").split("\n"));
+        return tokenizers.from("bpe", vocab, fs.readFileSync(merges, "utf8").split("\n"));
     }
 
-    return tokenizers.from(vocab.model.vocab, vocab.model.merges);
+    return tokenizers.from("bpe", vocab.model.vocab, vocab.model.merges);
 };
 
 module.exports = tokenizers;

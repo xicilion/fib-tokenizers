@@ -19,23 +19,23 @@ private:
 
 napi_value TikTokenizer::from(napi_env env, napi_callback_info info)
 {
-    size_t argc = 2;
-    napi_value args[2];
+    size_t argc = 3;
+    napi_value args[3];
     NODE_API_CALL(env, napi_get_cb_info(env, info, &argc, args, nullptr, nullptr));
 
-    NODE_API_ASSERT(env, argc == 1 || argc == 2, "Wrong number of arguments");
+    NODE_API_ASSERT(env, argc == 2 || argc == 3, "Wrong number of arguments");
 
     bool is_array;
-    NODE_API_CALL(env, napi_is_array(env, args[0], &is_array));
+    NODE_API_CALL(env, napi_is_array(env, args[1], &is_array));
     NODE_API_ASSERT(env, is_array, "Wrong argument type, must be array");
 
     LanguageModel base_model = LanguageModel::CL100K_BASE;
-    if (argc == 2) {
+    if (argc == 3) {
         napi_valuetype valuetype1;
-        NODE_API_CALL(env, napi_typeof(env, args[1], &valuetype1));
+        NODE_API_CALL(env, napi_typeof(env, args[2], &valuetype1));
         if (valuetype1 != napi_undefined) {
             NODE_API_ASSERT(env, valuetype1 == napi_string, "Wrong argument type, must be string");
-            std::string str_model = to_string(env, args[1]);
+            std::string str_model = to_string(env, args[2]);
             if (str_model == "cl100k_base")
                 base_model = LanguageModel::CL100K_BASE;
             else if (str_model == "r50k_base")
@@ -50,14 +50,14 @@ napi_value TikTokenizer::from(napi_env env, napi_callback_info info)
     }
 
     uint32_t i, length;
-    NODE_API_CALL(env, napi_get_array_length(env, args[0], &length));
+    NODE_API_CALL(env, napi_get_array_length(env, args[1], &length));
 
     std::vector<std::string> lines;
     lines.reserve(length);
 
     for (i = 0; i < length; i++) {
         napi_value e;
-        NODE_API_CALL(env, napi_get_element(env, args[0], i, &e));
+        NODE_API_CALL(env, napi_get_element(env, args[1], i, &e));
         lines.push_back(to_string(env, e));
     }
 

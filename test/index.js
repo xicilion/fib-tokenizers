@@ -7,7 +7,7 @@ const fs = require("fs");
 const tokenizers = require("..");
 
 describe("tokenizer", () => {
-    it("gpt-2", () => {
+    it("bpe", () => {
         const tokenizer = tokenizers.from_file(
             path.join(__dirname, "models/vocab.json"),
             path.join(__dirname, "models/merges.txt")

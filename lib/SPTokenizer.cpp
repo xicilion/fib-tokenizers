@@ -6,21 +6,21 @@ ABSL_FLAG(std::string, test_tmpdir, "test_tmp", "Temporary directory.");
 
 napi_value SPTokenizer::from(napi_env env, napi_callback_info info)
 {
-    size_t argc = 2;
-    napi_value args[2];
+    size_t argc = 3;
+    napi_value args[3];
     NODE_API_CALL(env, napi_get_cb_info(env, info, &argc, args, nullptr, nullptr));
 
-    NODE_API_ASSERT(env, argc == 1 || argc == 2, "Wrong number of arguments");
+    NODE_API_ASSERT(env, argc == 2 || argc == 3, "Wrong number of arguments");
 
     bool is_typedarray;
-    NODE_API_CALL(env, napi_is_typedarray(env, args[0], &is_typedarray));
+    NODE_API_CALL(env, napi_is_typedarray(env, args[1], &is_typedarray));
     NODE_API_ASSERT(env, is_typedarray, "Wrong argument type, must be typedarray");
 
     napi_typedarray_type type;
     napi_value input_buffer;
     size_t byte_offset;
     size_t i, length;
-    NODE_API_CALL(env, napi_get_typedarray_info(env, args[0], &type, &length, NULL, &input_buffer, &byte_offset));
+    NODE_API_CALL(env, napi_get_typedarray_info(env, args[1], &type, &length, NULL, &input_buffer, &byte_offset));
     NODE_API_ASSERT(env, type == napi_uint8_array, "Wrong argument type, must be Uint8Array");
 
     void* data;
@@ -29,7 +29,7 @@ napi_value SPTokenizer::from(napi_env env, napi_callback_info info)
 
     if (argc == 2) {
         napi_valuetype valuetype1;
-        NODE_API_CALL(env, napi_typeof(env, args[1], &valuetype1));
+        NODE_API_CALL(env, napi_typeof(env, args[2], &valuetype1));
         if (valuetype1 == napi_undefined)
             argc = 1;
         else {
@@ -44,13 +44,13 @@ napi_value SPTokenizer::from(napi_env env, napi_callback_info info)
         napi_throw_error(env, NULL, "Failed to load model");
     }
 
-    if (argc == 2) {
+    if (argc == 3) {
         try {
             napi_value k, v;
             napi_valuetype valuetype2;
 
             NODE_API_CALL(env, napi_create_string_utf8(env, "offset", NAPI_AUTO_LENGTH, &k));
-            NODE_API_CALL(env, napi_get_property(env, args[1], k, &v));
+            NODE_API_CALL(env, napi_get_property(env, args[2], k, &v));
 
             NODE_API_CALL(env, napi_typeof(env, v, &valuetype2));
             if (valuetype2 != napi_undefined) {
@@ -59,7 +59,7 @@ napi_value SPTokenizer::from(napi_env env, napi_callback_info info)
             }
 
             NODE_API_CALL(env, napi_create_string_utf8(env, "extra_options", NAPI_AUTO_LENGTH, &k));
-            NODE_API_CALL(env, napi_get_property(env, args[1], k, &v));
+            NODE_API_CALL(env, napi_get_property(env, args[2], k, &v));
 
             NODE_API_CALL(env, napi_typeof(env, v, &valuetype2));
             if (valuetype2 != napi_undefined) {
@@ -68,7 +68,7 @@ napi_value SPTokenizer::from(napi_env env, napi_callback_info info)
             }
 
             NODE_API_CALL(env, napi_create_string_utf8(env, "added_tokens", NAPI_AUTO_LENGTH, &k));
-            NODE_API_CALL(env, napi_get_property(env, args[1], k, &v));
+            NODE_API_CALL(env, napi_get_property(env, args[2], k, &v));
 
             NODE_API_CALL(env, napi_typeof(env, v, &valuetype2));
             if (valuetype2 != napi_undefined) {

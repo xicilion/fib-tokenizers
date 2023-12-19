@@ -25,17 +25,20 @@ napi_value Tokenizer::from(napi_env env, napi_callback_info info)
 
     NODE_API_ASSERT(env, argc >= 1, "Wrong number of arguments");
 
-    bool is_typedarray;
-    NODE_API_CALL(env, napi_is_typedarray(env, args[0], &is_typedarray));
-    if (is_typedarray)
+    napi_valuetype valuetype1;
+    NODE_API_CALL(env, napi_typeof(env, args[0], &valuetype1));
+    NODE_API_ASSERT(env, valuetype1 == napi_string, "Wrong argument type, must be string");
+
+    std::string type = to_string(env, args[0]);
+
+    if (type == "bpe")
+        return BPETokenizer::from(env, info);
+    else if (type == "sentencepiece")
         return SPTokenizer::from(env, info);
-
-    bool is_array;
-    NODE_API_CALL(env, napi_is_array(env, args[0], &is_array));
-    if (is_array)
+    else if (type == "tiktoken")
         return TikTokenizer::from(env, info);
-
-    return BPETokenizer::from(env, info);
+    else
+        napi_throw_error(env, NULL, "Unknown tokenizer type");
 }
 
 napi_value Tokenizer::encode(napi_env env, napi_callback_info info)
