@@ -7,6 +7,23 @@ const fs = require("fs");
 const tokenizers = require("..");
 
 describe("tokenizer", () => {
+    it("WordpieceTokenizer", () => {
+        const vocab_tokens = ["[UNK]", "[CLS]", "[SEP]", "want", "##want", "##ed", "wa", "un", "runn", "##ing"];
+        const vocab = {};
+
+        vocab_tokens.forEach((token, index) => {
+            vocab[token] = index;
+        });
+
+        const tokenizer = new tokenizers.WordpieceTokenizer(vocab, {
+            unk_token: "[UNK]"
+        });
+
+        assert.deepEqual(tokenizer.tokenize(""), []);
+        assert.deepEqual(tokenizer.tokenize("unwanted running"), ["un", "##want", "##ed", "runn", "##ing"]);
+        assert.deepEqual(tokenizer.tokenize("unwantedX running"), ["[UNK]", "runn", "##ing"]);
+    });
+
     it("bpe", () => {
         const tokenizer = tokenizers.from_file(
             path.join(__dirname, "models/vocab.json"),

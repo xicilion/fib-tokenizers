@@ -61,4 +61,12 @@ tokenizers.from_file = function (vocab, merges) {
     return tokenizers.from("bpe", vocab.model.vocab, vocab.model.merges);
 };
 
+tokenizers.from_model = function (folder) {
+    const vocab = path.join(folder, "vocab.json");
+    const merges = path.join(folder, "merges.txt");
+
+    return tokenizers.from_file(vocab, merges);
+
+};
+
 module.exports = tokenizers;

@@ -10,3 +10,12 @@ url = https://github.com/google/sentencepiece.git
 [submodule "cpp-tiktoken"]
 path = cpp-tiktoken
 url = https://github.com/gh-markt/cpp-tiktoken.git
+[submodule "onnxruntime-extensions"]
+	path = onnxruntime-extensions
+	url = https://github.com/microsoft/onnxruntime-extensions.git
+[submodule "GSL"]
+	path = GSL
+	url = https://github.com/microsoft/GSL.git
+[submodule "json"]
+	path = json
+	url = https://github.com/nlohmann/json.git
