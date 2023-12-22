@@ -15,6 +15,7 @@ test
 temp
 bin
 out
+addon
 
 huggingface-tokenizer-in-cxx
 cpp-tiktoken
