@@ -2,6 +2,22 @@
 
 napi_ref JSWordpieceTokenizer::constructor;
 
+JSWordpieceTokenizer::JSWordpieceTokenizer(napi_env env, napi_callback_info info, napi_value& _this)
+    : env_(env)
+{
+    size_t argc = 2;
+    napi_value args[2];
+    NODE_API_CALL_RETURN_VOID(env, napi_get_cb_info(env, info, &argc, args, &_this, nullptr));
+
+    vocab_array = NodeValue(env, args[0]);
+    for (int i = 0; i < vocab_array.size(); i++)
+        vocab_[vocab_array[i]] = i;
+
+    NodeOpt opt(env, args[1]);
+    unk_token_ = opt.Get("unk_token", std::u16string(u"UNK"));
+    max_input_chars_per_word_ = opt.Get("max_input_chars_per_word", max_input_chars_per_word_);
+}
+
 napi_value JSWordpieceTokenizer::Init(napi_env env)
 {
     napi_property_descriptor properties[] = {
