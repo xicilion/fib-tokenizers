@@ -39,11 +39,9 @@ private:
         for (int i = 0; i < obj->vocab_array.size(); i++)
             obj->vocab_[obj->vocab_array[i]] = i;
 
-        if (argc > 1) {
-            NodeOpt opt(env, args[1]);
-            obj->unk_token_ = opt.Get("unk_token", std::u16string(u"UNK"));
-            obj->max_input_chars_per_word_ = opt.Get("max_input_chars_per_word", obj->max_input_chars_per_word_);
-        }
+        NodeOpt opt(env, args[1]);
+        obj->unk_token_ = opt.Get("unk_token", std::u16string(u"UNK"));
+        obj->max_input_chars_per_word_ = opt.Get("max_input_chars_per_word", obj->max_input_chars_per_word_);
 
         obj->env_ = env;
         NODE_API_CALL(env, napi_wrap(env, _this, obj.get(), Destructor, nullptr, &obj->wrapper_));

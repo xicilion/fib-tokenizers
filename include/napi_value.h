@@ -224,13 +224,20 @@ public:
     NodeOpt(napi_env env, napi_value opt)
         : env_(env)
     {
-        NODE_API_CALL_RETURN_VOID(env_, napi_coerce_to_object(env_, opt, &opt_));
+        napi_valuetype valuetype = napi_undefined;
+        napi_typeof(env_, opt, &valuetype);
+        if (valuetype != napi_undefined) {
+            NODE_API_CALL_RETURN_VOID(env_, napi_coerce_to_object(env_, opt, &opt_));
+        }
     }
 
 public:
     template <typename VALUE_TYPE>
     VALUE_TYPE Get(const char* name, VALUE_TYPE default_value) const
     {
+        if (!opt_)
+            return default_value;
+
         napi_value value;
         if (napi_get_named_property(env_, opt_, name, &value) != napi_ok)
             return default_value;
@@ -245,5 +252,5 @@ public:
 
 private:
     napi_env env_;
-    napi_value opt_;
+    napi_value opt_ = nullptr;
 };

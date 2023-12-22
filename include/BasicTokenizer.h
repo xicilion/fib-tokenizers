@@ -36,13 +36,10 @@ private:
 
         std::unique_ptr<JSBasicTokenizer> obj(new JSBasicTokenizer());
 
-        if (argc > 0) {
-            NodeOpt opt(env, args[0]);
-            obj->tokenizer_ = std::make_shared<BasicTokenizer>(
-                opt.Get("do_lower_case", true), opt.Get("tokenize_chinese_chars", true),
-                opt.Get("strip_accents", true), opt.Get("do_split_on_punc", true), true);
-        } else
-            obj->tokenizer_ = std::make_shared<BasicTokenizer>(true, true, true, true, true);
+        NodeOpt opt(env, args[0]);
+        obj->tokenizer_ = std::make_shared<BasicTokenizer>(
+            opt.Get("do_lower_case", true), opt.Get("tokenize_chinese_chars", true),
+            opt.Get("strip_accents", true), opt.Get("do_split_on_punc", true), true);
 
         obj->env_ = env;
         NODE_API_CALL(env, napi_wrap(env, _this, obj.get(), Destructor, nullptr, &obj->wrapper_));
