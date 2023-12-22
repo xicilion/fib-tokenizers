@@ -35,7 +35,10 @@ private:
 
         std::unique_ptr<JSWordpieceTokenizer> obj(new JSWordpieceTokenizer());
 
-        obj->vocab_ = NodeValue(env, args[0]);
+        obj->vocab_array = NodeValue(env, args[0]);
+        for (int i = 0; i < obj->vocab_array.size(); i++)
+            obj->vocab_[obj->vocab_array[i]] = i;
+
         if (argc > 1) {
             NodeOpt opt(env, args[1]);
             obj->unk_token_ = opt.Get("unk_token", std::u16string(u"UNK"));
@@ -64,6 +67,7 @@ private:
     napi_ref wrapper_;
 
 private:
+    std::vector<std::u16string> vocab_array;
     std::unordered_map<std::u16string, int32_t> vocab_;
     std::u16string unk_token_;
     uint32_t max_input_chars_per_word_ = 100;

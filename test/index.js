@@ -86,13 +86,7 @@ describe("tokenizer", () => {
     });
 
     it("WordpieceTokenizer", () => {
-        const vocab_tokens = ["[UNK]", "[CLS]", "[SEP]", "want", "##want", "##ed", "wa", "un", "runn", "##ing"];
-        const vocab = {};
-
-        vocab_tokens.forEach((token, index) => {
-            vocab[token] = index;
-        });
-
+        const vocab = ["[UNK]", "[CLS]", "[SEP]", "want", "##want", "##ed", "wa", "un", "runn", "##ing"];
         const tokenizer = new tokenizers.WordpieceTokenizer(vocab, {
             unk_token: "[UNK]"
         });
