@@ -148,7 +148,7 @@ public:
         size_t size;
         NODE_API_CALL(env_, napi_get_value_string_utf8(env_, value_, nullptr, 0, &size));
         result.resize(size);
-        char* data = &result[0];
+        char* data = result.data();
         NODE_API_CALL(env_, napi_get_value_string_utf8(env_, value_, data, size + 1, nullptr));
         return result;
     }
@@ -159,7 +159,7 @@ public:
         size_t size;
         NODE_API_CALL_BASE(env_, napi_get_value_string_utf16(env_, value_, nullptr, 0, &size), result);
         result.resize(size);
-        char16_t* data = &result[0];
+        char16_t* data = result.data();
         NODE_API_CALL_BASE(env_, napi_get_value_string_utf16(env_, value_, data, size + 1, nullptr), result);
         return result;
     }
